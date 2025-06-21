@@ -256,13 +256,13 @@ export async function getUserProfile(
     ] = result
 
     const profile: HealthProfile = {
-      name,
-      age,
-      gender,
-      chronicCondition: chronicConditions || [],
-      preferredWalkTime: preferredWalkTime || "",
-      pollutionSensitivity: pollutionSensitivity || "",
-      location: location || "",
+      name: String(name || ""),
+      age: Number(age || 0),
+      gender: String(gender || ""),
+      chronicCondition: Array.isArray(chronicConditions) ? chronicConditions.map(String) : [],
+      preferredWalkTime: String(preferredWalkTime || ""),
+      pollutionSensitivity: String(pollutionSensitivity || ""),
+      location: String(location || ""),
     }
 
     return { success: true, profile }
