@@ -55,9 +55,25 @@ export function getStoredWallet(userId?: string): AptosWallet | null {
     const key = userId ? `aptos_wallet_${userId}` : "aptos_wallet"
     const stored = localStorage.getItem(key)
     if (stored) {
-      const wallet = JSON.parse(stored)
-      console.log(`Wallet retrieved for user ${userId}:`, wallet.address)
-      return wallet
+      try {
+        const wallet = JSON.parse(stored)
+        
+        // Validate wallet structure
+        if (!wallet || typeof wallet !== 'object' || !wallet.address || !wallet.privateKey || !wallet.publicKey) {
+          console.error("Invalid wallet structure in localStorage:", wallet)
+          // Clear the corrupted wallet
+          localStorage.removeItem(key)
+          return null
+        }
+        
+        console.log(`Wallet retrieved for user ${userId}:`, wallet.address)
+        return wallet
+      } catch (parseError) {
+        console.error("Failed to parse stored wallet:", parseError)
+        // Clear the corrupted wallet data
+        localStorage.removeItem(key)
+        return null
+      }
     } else {
       console.log(`No wallet found for user ${userId}`)
       return null
@@ -71,7 +87,31 @@ export function clearWallet(userId?: string): void {
   if (typeof window !== "undefined") {
     const key = userId ? `aptos_wallet_${userId}` : "aptos_wallet"
     localStorage.removeItem(key)
+    console.log(`Wallet cleared for user ${userId}`)
   }
+}
+
+// Clear corrupted wallet data and return true if corruption was found
+export function clearCorruptedWallet(userId?: string): boolean {
+  if (typeof window !== "undefined") {
+    const key = userId ? `aptos_wallet_${userId}` : "aptos_wallet"
+    const stored = localStorage.getItem(key)
+    if (stored) {
+      try {
+        const wallet = JSON.parse(stored)
+        if (!wallet || typeof wallet !== 'object' || !wallet.address || !wallet.privateKey || !wallet.publicKey) {
+          console.log(`Clearing corrupted wallet for user ${userId}`)
+          localStorage.removeItem(key)
+          return true
+        }
+      } catch (parseError) {
+        console.log(`Clearing corrupted wallet data for user ${userId}`)
+        localStorage.removeItem(key)
+        return true
+      }
+    }
+  }
+  return false
 }
 
 // Check if user has a wallet with user-specific key
@@ -133,73 +173,40 @@ export async function submitProfileTransaction(
   }
 }
 
-// Get user profile from blockchain
-export async function getUserProfile(
-  wallet: AptosWallet
-): Promise<{ success: boolean; profile?: HealthProfile; error?: string }> {
+// Helper function to safely parse blockchain responses
+function safeParseBlockchainResponse(result: any): any {
   try {
-    const privateKey = new Ed25519PrivateKey(wallet.privateKey);
-    const account = Account.fromPrivateKey({ privateKey });
+    // If result is already an array, return it
+    if (Array.isArray(result)) {
+      return result;
+    }
     
-    // Call the view_profile function to get profile data
-    const payload = {
-      function: `${CONTRACT_ADDRESS}::${MODULE_NAME}::view_profile` as `${string}::${string}::${string}`,
-      functionArguments: [account.accountAddress.toString()],
-    };
-
-    const result = await aptos.view({payload});
+    // If result is a string, try to parse it as JSON
+    if (typeof result === 'string') {
+      // Check if it starts with common error prefixes
+      if (result.startsWith('Per anonym') || result.startsWith('Permission') || result.startsWith('Error')) {
+        throw new Error(result);
+      }
+      
+      // Try to parse as JSON
+      try {
+        return JSON.parse(result);
+      } catch (parseError) {
+        console.warn("Failed to parse string as JSON:", result);
+        return result;
+      }
+    }
     
-    // The view_profile function returns a tuple, which the SDK returns as a flat array of values.
-    const [name, age, gender, chronicConditions, preferredWalkTime, pollutionSensitivity, location] = result as [string, number, string, string[], string, string, string];
+    // If result is an object, return it
+    if (typeof result === 'object' && result !== null) {
+      return result;
+    }
     
-    const profile: HealthProfile = {
-      name,
-      age,
-      gender,
-      chronicCondition: chronicConditions,
-      preferredWalkTime,
-      pollutionSensitivity,
-      location,
-    };
-    
-    return {
-      success: true,
-      profile,
-    };
+    // If result is a primitive, wrap it in an array
+    return [result];
   } catch (error) {
-    console.error("Failed to get user profile:", error);
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : "Unknown error",
-    };
-  }
-}
-
-// Check if user has a profile
-export async function hasUserProfile(
-  wallet: AptosWallet
-): Promise<{ success: boolean; hasProfile?: boolean; error?: string }> {
-  try {
-    const privateKey = new Ed25519PrivateKey(wallet.privateKey);
-    const account = Account.fromPrivateKey({ privateKey });
-    
-    const payload = {
-      function: `${CONTRACT_ADDRESS}::${MODULE_NAME}::has_profile` as `${string}::${string}::${string}`,
-      functionArguments: [account.accountAddress.toString()],
-    };
-
-    const result = await aptos.view({payload});
-
-    return {
-      success: true,
-      hasProfile: result[0] as boolean,
-    };
-  } catch (error) {
-    console.error("Failed to check user profile:", error);
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : "Unknown error",
-    };
+    console.error("Error parsing blockchain response:", error);
+    throw error;
   }
 }
 
@@ -208,9 +215,115 @@ export function clearAllWallets(): void {
   if (typeof window !== "undefined") {
     Object.keys(localStorage).forEach(key => {
       if (key.startsWith("aptos_wallet")) {
-        localStorage.removeItem(key);
+        localStorage.removeItem(key)
       }
-    });
-    console.log("All Aptos wallets cleared from local storage.");
+    })
+    console.log("All Aptos wallets cleared from local storage.")
+  }
+}
+
+// Get user profile from blockchain
+export async function getUserProfile(
+  wallet: AptosWallet
+): Promise<{ success: boolean; profile?: HealthProfile; error?: string }> {
+  try {
+    const privateKey = new Ed25519PrivateKey(wallet.privateKey)
+    const account = Account.fromPrivateKey({ privateKey })
+
+    const payload = {
+      function: `${CONTRACT_ADDRESS}::${MODULE_NAME}::view_profile` as `${string}::${string}::${string}`,
+      functionArguments: [account.accountAddress.toString()],
+    }
+
+    const result = await aptos.view({ payload })
+
+    if (!Array.isArray(result) || result.length < 7) {
+      console.error("Invalid data structure from view_profile:", result)
+      return {
+        success: false,
+        error: "Invalid data structure returned from blockchain",
+      }
+    }
+
+    const [
+      name,
+      age,
+      gender,
+      chronicConditions,
+      preferredWalkTime,
+      pollutionSensitivity,
+      location,
+    ] = result
+
+    const profile: HealthProfile = {
+      name,
+      age,
+      gender,
+      chronicCondition: chronicConditions || [],
+      preferredWalkTime: preferredWalkTime || "",
+      pollutionSensitivity: pollutionSensitivity || "",
+      location: location || "",
+    }
+
+    return { success: true, profile }
+  } catch (error) {
+    console.warn("Caught error in getUserProfile:", error)
+    const errorMessage = error instanceof Error ? error.message : String(error)
+
+    if (
+      errorMessage.includes("Failed to parse") ||
+      errorMessage.includes("Per anonym") ||
+      errorMessage.includes("profile not found")
+    ) {
+      return { success: false, error: "Profile not found or access denied." }
+    }
+
+    return {
+      success: false,
+      error: "An unexpected error occurred while fetching the profile.",
+    }
+  }
+}
+
+// Check if user has a profile
+export async function hasUserProfile(
+  wallet: AptosWallet
+): Promise<{ success: boolean; hasProfile?: boolean; error?: string }> {
+  try {
+    const privateKey = new Ed25519PrivateKey(wallet.privateKey)
+    const account = Account.fromPrivateKey({ privateKey })
+
+    const payload = {
+      function: `${CONTRACT_ADDRESS}::${MODULE_NAME}::has_profile` as `${string}::${string}::${string}`,
+      functionArguments: [account.accountAddress.toString()],
+    }
+
+    const result = await aptos.view({ payload })
+
+    if (!Array.isArray(result) || typeof result[0] !== "boolean") {
+      console.error("Invalid data from has_profile:", result)
+      return {
+        success: false,
+        error: "Invalid data type returned from has_profile",
+      }
+    }
+
+    return { success: true, hasProfile: result[0] }
+  } catch (error) {
+    console.warn("Caught error in hasUserProfile:", error)
+    const errorMessage = error instanceof Error ? error.message : String(error)
+
+    if (
+      errorMessage.includes("Failed to parse") ||
+      errorMessage.includes("Per anonym") ||
+      errorMessage.includes("profile not found")
+    ) {
+      return { success: true, hasProfile: false }
+    }
+
+    return {
+      success: false,
+      error: "An unexpected error occurred while checking the profile.",
+    }
   }
 }

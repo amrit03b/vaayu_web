@@ -13,7 +13,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Progress } from "@/components/ui/progress"
 import { getStoredWallet, createWallet, storeWallet, submitProfileTransaction, getUserProfile, hasUserProfile, type HealthProfile } from "@/lib/aptos"
 import { useUser } from "@civic/auth/react"
-import { ArrowLeft, Loader2, CheckCircle, User, Heart, MapPin, Clock, Sparkles, AlertTriangle } from "lucide-react"
+import { ArrowLeft, Loader2, CheckCircle, User, Heart, MapPin, Clock, Sparkles, AlertTriangle, Shield } from "lucide-react"
 import Link from "next/link"
 
 const CHRONIC_CONDITIONS = ["Asthma", "Diabetes Type 1", "Diabetes Type 2", "COPD", "Heart Disease", "Allergies", "Hypertension", "Other"]
@@ -59,46 +59,47 @@ export default function OnboardingPage() {
       return
     }
     
-    // Get the existing wallet for this user (should already exist from login)
-    const existingWallet = getStoredWallet(user.id)
-    if (!existingWallet) {
-      console.error("No wallet found for user:", user.id)
-      setError("Wallet not found. Please log in again.")
-      return
-    }
-    
-    console.log("Using existing wallet for onboarding:", user.id, existingWallet.address)
-    
-    // Check if user already has a profile on the blockchain
+    const stableUserId = user.email || user.id
+
     const checkExistingProfile = async () => {
-      try {
-        const hasProfileResult = await hasUserProfile(existingWallet)
-        if (hasProfileResult.success && hasProfileResult.hasProfile) {
-          // User has a profile, load it
-          const profileResult = await getUserProfile(existingWallet)
-          if (profileResult.success && profileResult.profile) {
-            const profile = profileResult.profile
-            setFormData({
-              name: profile.name,
-              age: profile.age.toString(),
-              gender: profile.gender,
-              chronicConditions: profile.chronicCondition,
-              preferredWalkTime: profile.preferredWalkTime,
-              pollutionSensitivity: profile.pollutionSensitivity,
-              location: profile.location,
-            })
-            setIsEditing(true)
-            console.log("Loaded existing profile:", profile)
-          }
-        }
-      } catch (error) {
-        console.error("Error checking for existing profile:", error)
-        // Continue with empty form if there's an error
+      setIsLoading(true)
+      const existingWallet = getStoredWallet(stableUserId)
+
+      if (!existingWallet) {
+        setError("Wallet not found. Please log in again.")
+        setIsLoading(false)
+        return
       }
+
+      console.log(
+        "Checking for existing profile for onboarding:",
+        existingWallet.address
+      )
+      const profileResult = await getUserProfile(existingWallet)
+
+      if (profileResult.success && profileResult.profile) {
+        // Profile exists, pre-fill form
+        const profile = profileResult.profile
+        setFormData({
+          name: profile.name,
+          age: profile.age.toString(),
+          gender: profile.gender,
+          chronicConditions: profile.chronicCondition || [],
+          preferredWalkTime: profile.preferredWalkTime || "",
+          pollutionSensitivity: profile.pollutionSensitivity || "",
+          location: profile.location || "",
+        })
+        setIsEditing(true)
+        console.log("Loaded existing profile for editing:", profile)
+      } else {
+        // No profile exists, or there was a non-fatal error
+        console.log("No existing profile found. Starting new submission.")
+        setIsEditing(false)
+      }
+      setIsLoading(false)
     }
-    
+
     checkExistingProfile()
-    setIsLoading(false)
   }, [router, user, userLoading])
 
   useEffect(() => {
@@ -131,7 +132,9 @@ export default function OnboardingPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    const currentWallet = getStoredWallet(user?.id)
+    // Use a more stable identifier - prefer email if available, fallback to ID
+    const stableUserId = user?.email || user?.id;
+    const currentWallet = getStoredWallet(stableUserId)
     if (!currentWallet) {
       setError("No wallet found. Please log in again.")
       return

@@ -10,16 +10,26 @@ export default function ContinueToDashboardButton() {
 
   useEffect(() => {
     if (!isLoading && user?.id) {
+      // Log the full user object to see what identifiers are available
+      console.log("Civic user object:", user);
+      console.log("User ID:", user.id);
+      console.log("User email:", user.email);
+      console.log("User wallet:", user.wallet);
+      
+      // Use a more stable identifier - prefer email if available, fallback to ID
+      const stableUserId = user.email || user.id;
+      console.log("Using stable user ID:", stableUserId);
+      
       // Check if wallet exists for this specific user
-      const existingWallet = getStoredWallet(user.id);
+      const existingWallet = getStoredWallet(stableUserId);
       
       if (!existingWallet) {
         // Only create wallet if it doesn't exist for this user
         const newWallet = createWallet();
-        storeWallet(newWallet, user.id);
-        console.log("Created new wallet for user:", user.id, newWallet.address);
+        storeWallet(newWallet, stableUserId);
+        console.log("Created new wallet for user:", stableUserId, newWallet.address);
       } else {
-        console.log("Using existing wallet for user:", user.id, existingWallet.address);
+        console.log("Using existing wallet for user:", stableUserId, existingWallet.address);
       }
       
       setIsAuthed(true);
