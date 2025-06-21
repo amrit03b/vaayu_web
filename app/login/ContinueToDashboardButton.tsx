@@ -14,7 +14,6 @@ export default function ContinueToDashboardButton() {
       console.log("Civic user object:", user);
       console.log("User ID:", user.id);
       console.log("User email:", user.email);
-      console.log("User wallet:", user.wallet);
       
       // Use a more stable identifier - prefer email if available, fallback to ID
       const stableUserId = user.email || user.id;
