@@ -1,104 +1,309 @@
-# 🍃 Vaayu - Your Environmental Health Companion
+# 🍃 Vaayu – Your Environmental Health Companion
 
-**Your personalized environmental health companion for chronic conditions.**
+**Vaayu** is a decentralized, AI-powered mobile and web application that empowers individuals—especially those with chronic health conditions—to monitor their environmental exposure and receive actionable health guidance based on real-time air quality data.
 
-Vaayu is a web application designed to help individuals, especially those with chronic health conditions, manage their environmental exposure and make informed decisions about their well-being. It securely connects your health profile with real-time air quality data, providing personalized recommendations at your fingertips.
+---
 
-## ✨ The Core Idea
+## 🚨 The Problem It Solves
 
-In a world with increasing environmental health concerns, Vaayu empowers you to take control. Instead of storing your sensitive health data on a centralized server, Vaayu uses a decentralized approach. Your identity is managed by **Civic**, and your health profile is stored on the **Aptos blockchain** in a wallet that only you control. This ensures data privacy and sovereignty while enabling powerful, personalized insights.
+India is facing a growing **public health crisis** due to **air pollution**. In 2024–25, cities like Delhi recorded AQI in the *“severe”* category for weeks at a time, resulting in:
 
-## 🚀 Key Features
+- ❌ School closures and public health emergencies  
+- ⚠️ Over 2.3 million pollution-related premature deaths *(The Lancet, 2025)*  
+- 🚫 Lack of tools offering personalized, real-time environmental health guidance  
 
-- **🔒 Decentralized Identity:** Secure and simple login using Civic.
-- **🔐 User-Owned Data:** Your health profile is stored on the Aptos blockchain, giving you full control.
-- ** wallets for each user.
-- **🌬️ Real-time AQI Monitoring:** Get the latest Air Quality Index (AQI) data for your current location.
-- **❤️ Personalized Recommendations:** Receive health advice based on real-time environmental conditions and your unique health profile.
-- **🖥️ Clean Dashboard:** A simple, intuitive interface to view your data and recommendations.
-- **🏆 Rewards System:** (Future) A system to reward users for actively managing their health.
+Most existing solutions are either:
+- Static AQI display apps
+- Generic wellness trackers  
+They **fail to connect** real-world environmental conditions with **individualized health needs**.
 
-## 🛠️ How It Works
+---
 
-1.  **Sign In with Civic:** The user authenticates their identity using the Civic mobile app, ensuring a secure and reusable digital identity.
-2.  **Aptos Wallet Creation:** Upon first login, Vaayu automatically creates a new, personal Aptos wallet for the user, securely linked to their Civic ID.
-3.  **On-Chain Health Profile:** The user completes an onboarding process, and their health data (chronic conditions, sensitivities, etc.) is stored as a resource on the Aptos blockchain via a smart contract transaction.
-4.  **Personalized Dashboard:** The application reads the user's health profile from the blockchain and fetches real-time AQI data to display personalized alerts and recommendations on their dashboard.
+## 💡 What You Can Use Vaayu For
 
-## 💻 Tech Stack
+### 📍 Live AQI Alerts & Safe Zone Mapping
+- Real-time **AQI alerts** based on your **GPS location**
+- Map view of surroundings by AQI category (green, yellow, red)
+- Distance calculation to nearest unsafe zone
 
-- **Framework:** [Next.js](https://nextjs.org/) (App Router)
-- **Language:** [TypeScript](https://www.typescriptlang.org/)
-- **Styling:** [Tailwind CSS](https://tailwindcss.com/)
-- **UI Components:** [shadcn-ui](https://ui.shadcn.com/)
-- **Blockchain:** [Aptos](https://aptos.dev/)
-- **Identity:** [Civic](https://www.civic.com/)
-- **Data Fetching:** SWR, Fetch API
-- **State Management:** React Hooks / Context API
+### 🧠 Personalized Health Recommendations (AI + Blockchain)
+- Login securely using **Civic Auth**
+- Input profile details: age, gender, sleep cycle, walking habits
+- Data stored on **Aptos blockchain** for **ownership & privacy**
+- **AI-powered suggestions** based on habits + AQI data  
+  > “You usually walk to the mosque at 5 PM, but AQI is severe then. Try 6 AM instead.”
 
-## 🏁 Getting Started
+### ✅ Daily Health Challenges & Rewards
+- Tasks like:
+  - 💧 Drink 3 liters of water  
+  - 🚶 Walk 3000 steps daily  
+- Earn **Green Tokens** 🪙 for completing them
 
-Follow these instructions to set up and run the project locally.
+### 🛍️ Green Token Redemption 
+- Redeem tokens for:
+  - Eco-friendly products
+  - Partner brand discounts
+  - Sponsored health services
 
-### Prerequisites
+### 📊 Lifestyle Analytics & Health Score
+- Tracks:
+  - Task completion  
+  - Daily consistency
+- Generates dynamic **health score**
+- Visualizes long-term patterns between **health habits & pollution exposure**
 
-- [Node.js](https://nodejs.org/en/) (v18 or later)
-- [pnpm](https://pnpm.io/installation) (recommended)
-- A mobile device with the [Civic Wallet App](https://www.civic.com/wallet/) installed.
+---
 
-### 1. Clone the Repository
+## 🔐 Why Vaayu is Unique
+
+| Feature | Description |
+|--------|-------------|
+| 🌐 **Civic Auth** | Decentralized digital identity for secure, passwordless login |
+| 🔗 **Aptos Blockchain** | User health data stored on-chain, owned by the user |
+| 🤖 **AI-Generated Advice** | Personalized suggestions using Gemini-powered ML |
+| 📍 **GPS + AQI Mapping** | Dynamic heatmaps and location-based alerts |
+| 🪙 **Green Tokens** | Gamified system to reward healthy behaviors |
+| 📱 **Cross-Platform** | Built for both **Web (Next.js)** and **Mobile (React Native)** |
+
+---
+
+## 🧠 Architecture Overview
+
+- 🧾 **Frontend**  
+  - `React Native` (mobile)
+  - `Next.js` (web + backend handling)
+  - `Tailwind CSS` + `shadcn-ui`
+
+- 🔐 **Authentication**  
+  - Civic SDK for identity verification
+  - JWT tokens to maintain secure sessions
+
+- 🔗 **Blockchain Integration**  
+  - Health profile stored as smart contract resource on **Aptos**
+  - Blockchain interactions handled via a **Next.js backend**
+
+- 🌍 **Live AQI Integration**  
+  - AQICN API for real-time air quality data
+  - GPS used to match user location with nearby pollution zones
+
+- 🧠 **AI Engine**  
+  - Gemini for behavior-aware, contextual advice
+
+---
+
+## 🛠️ How to Run Locally
+
+### 🔧 Prerequisites
+- Node.js v18+
+- pnpm
+- Civic Wallet app (for login)
+- AQICN API key
+
+### 📥 Installation
 
 ```bash
 git clone https://github.com/your-username/vaayu.git
 cd vaayu
-```
-
-### 2. Install Dependencies
-
-```bash
 pnpm install
-```
 
-### 3. Set Up Environment Variables
+## 🌱 Setup `.env.local`
 
-You need an API token from the World Air Quality Index project to fetch AQI data.
+To fetch real-time AQI data, create a `.env.local` file in the root directory and add your AQICN API token:
 
-1.  Go to the [AQICN Token Platform](https://aqicn.org/data-platform/token/) and register for a free token.
-2.  Create a file named `.env.local` in the root of the project.
-3.  Add your token to the file:
-
-```.env
+```env
 NEXT_PUBLIC_AQICN_TOKEN=your_api_token_here
-```
+````
 
-### 4. Run the Development Server
+---
+
+## ▶️ Run the Dev Server
+
+Start the development server using the following command:
 
 ```bash
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
+Then open your browser and visit:
 
-## 🗺️ Project Structure
+```
+http://localhost:3000
+```
 
-The project uses the Next.js App Router structure:
+---
 
--   `app/`: Contains all routes and pages.
-    -   `api/`: API routes, including the Civic auth handler.
-    -   `dashboard/`: The main user dashboard.
-    -   `onboarding/`: The health profile setup flow.
-    -   `login/`: The main login page.
--   `components/`: Shared React components.
-    -   `ui/`: Components from shadcn-ui.
--   `lib/`: Core application logic.
-    -   `aptos.ts`: Functions for interacting with the Aptos blockchain (wallet creation, transactions).
-    -   `civic.ts`: Configuration for Civic authentication.
--   `sources/`: Contains the Move smart contract for the health profile (`onboarding.move`).
+## 🗂️ Project Structure
+
+```bash
+/app                 → Next.js app routes (dashboard, login, onboarding)
+/api                 → API handlers (e.g. Civic authentication)
+/components          → Shared UI components
+/ui                  → shadcn-ui based design system
+/lib
+  ├─ aptos.ts        → Blockchain functions (wallet, transactions)
+  └─ civic.ts        → Civic auth utilities
+/sources
+  └─ onboarding.move → Move smart contract for storing health profiles
+```
+
+---
+
+## 🧩 Technologies Used
+
+* **Frontend**: React Native, Next.js
+* **Styling**: Tailwind CSS, shadcn-ui
+* **Authentication**: Civic
+* **Blockchain**: Aptos + Move smart contracts
+* **Data Fetching**: Fetch API, SWR
+* **AI**: Gemini for ML-powered health recommendations
+* **Location**: GPS + AQICN API (for real-time AQI data)
+
+---
+
+## ⚠️ Technical Challenges & Solutions
+
+### 1. Civic Auth in React Native
+
+**Issue**: Civic SDK lacks official support for React Native
+✅ **Solution**: Reverse-engineered web SDK, implemented custom JWT parsing and secure redirects manually.
+
+### 2. Aptos Integration on Mobile
+
+**Issue**: No React Native-compatible libraries for Aptos blockchain
+✅ **Solution**: Offloaded blockchain operations to a Next.js backend and communicated via secure REST APIs.
+
+### 3. Real-Time AQI Mapping
+
+**Issue**: Frequent GPS updates caused API lags and performance issues
+✅ **Solution**: Optimized with throttled API polling, clustering, and heatmap-based visualization.
+
+## 🔐 Civic Auth Hackathon Track Submission
+
+### 🔐 Civic Auth Integration
+
+Civic Auth is the **core identity layer** in our app, enabling secure, reusable, and seamless authentication across both web and mobile platforms.
+
+- ✅ Civic Auth is integrated on both **React Native (mobile)** and **Next.js (web)** versions.
+- 🔐 Users log in using Civic, receive a verified JWT, and begin a personalized onboarding experience.
+- 🔗 The identity is linked with lifestyle data (age, sleep cycle, walking habits), securely stored on the **Aptos blockchain**.
+- 🧠 This data powers an **AI-driven health recommendation system** based on real-time AQI and personal patterns.
+- Despite limited React Native support, we implemented a custom flow for JWT handling and secure redirect management.
+
+---
+
+### 🚀 Go-to-Market Readiness
+
+Our app directly addresses India's growing **air pollution crisis** by combining identity, location, and health data for proactive wellness support:
+
+- 🏙️ Designed for city dwellers, daily commuters, and vulnerable groups (children, elderly, patients).
+- 📍 Provides real-time AQI zone alerts and daily health guidance.
+- 🎯 Green Token reward system incentivizes healthy actions and can be redeemed for partner discounts and eco-products.
+- 📈 Launch plan includes metro-focused rollouts, brand partnerships, and awareness drives via healthcare networks.
+
+---
+
+### 💡 Use Case & Innovation
+
+We merge:
+
+- **Civic Auth** (secure identity)
+- **Aptos Blockchain** (verifiable health data storage)
+- **Gemini AI** (personalized recommendations)
+- **AQICN + GPS** (live environmental awareness)
+
+This isn’t just an AQI or health app—it’s a **smart wellness assistant** that dynamically adapts to a user's location, lifestyle, and routine using decentralized, privacy-first infrastructure.
+
+---
+
+### 🎥 Presentation & Demo
+
+A working demo is hosted on **Vercel** (Web) and **Expo Go** (Mobile).  
+Our demo video includes:
+
+- Civic login flow  
+- User onboarding with lifestyle data  
+- AQI mapping + live alerts  
+- Health tasks, token rewards, and blockchain sync
+
+---
+
+### ✅ Civic Hackathon Requirements: Checklist
+
+| Requirement              | Status                                                                 |
+|--------------------------|------------------------------------------------------------------------|
+| Civic Auth Integrated    | ✅ Yes, integrated on both Web & Mobile with JWT + session handling     |
+| Working Demo             | ✅ Deployed on Vercel (Web) and Expo (Mobile)                           |
+| 1-Sentence Description   | "A Civic-authenticated health & AQI companion that protects users from pollution and rewards healthy behavior with real-time, blockchain-secured personalization." |
+| GitHub Repository        | ✅ Full source code (frontend, backend, smart contracts) included       |
+| Demo Video               | ✅ Walkthrough of login, AQI alerts, task tracking, token logic         |
+| Original Work            | ✅ 100% original codebase, architecture, and design                     |
+
+
+## 🧩 Aptos Full-Stack Hackathon Track Submission
+
+### 🌐 Overview
+
+This project is a **real-world, full-stack wellness dApp** built on the Aptos blockchain. It securely stores user lifestyle data (age, sleep cycle, etc.) on-chain and leverages it to provide:
+
+- 🔴 Real-time AQI zone alerts and pollution-safe navigation  
+- 🪙 Daily health challenge rewards via a Green Token system  
+- 🤖 AI-powered personalized health advice based on blockchain-stored data  
+- ✅ Transparent and user-owned data using Aptos smart contracts  
+
+The app abstracts blockchain complexity while preserving decentralization and privacy—offering a Web3 experience for non-Web3 users.
+
+---
+
+### ✅ How This Aligns with the Track
+
+| Objective            | Implementation                                                                 |
+|----------------------|---------------------------------------------------------------------------------|
+| **Full-Stack dApp**   | Built using React (web), React Native (mobile), Next.js (backend), and Move    |
+| **Aptos Integration** | Secure on-chain storage of user health data via custom Move smart contracts     |
+| **Smart Contracts**   | Handle user profiles, token eligibility, and metadata storage                  |
+| **Backend**           | Bridges frontend and Aptos using RESTful APIs and Aptos SDK                    |
+| **Frontend**          | React Native + React with AQI mapping, token tracking, and habit visualizations |
+| **Real-World Utility**| Tackles India's pollution crisis with personalized, preventive tech             |
+| **User Experience**   | Civic Auth + tokenless interaction = smooth, non-technical onboarding          |
+
+---
+
+### 🔍 Deep Dive into Aptos Integration
+
+| Layer         | Integration Details                                                                 |
+|---------------|--------------------------------------------------------------------------------------|
+| Smart Contracts | Written in Move to manage health data, tokens, and user onboarding                 |
+| Backend       | Next.js API handles Aptos wallet logic, signing, and on-chain interactions          |
+| Frontend      | React Native + React apps fetch real-time data from AQICN + Aptos-backed APIs       |
+| Storage       | All user metadata (age, habits, etc.) is immutably stored on Aptos for transparency |
+
+---
+
+### 💡 1-Sentence Summary
+
+A full-stack wellness dApp that uses Aptos blockchain to store personal health data and deliver AI-powered, real-time air quality alerts and reward-based lifestyle guidance.
+
+
+---
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please feel free to open an issue or submit a pull request.
+We welcome contributions!
+
+* Open an issue
+* Submit a pull request
+* Suggest new features or integrations
+
+---
 
 ## 📄 License
 
-This project is licensed under the MIT License. See the `LICENSE` file for details.
+This project is licensed under the **MIT License**.
+See the `LICENSE` file for details.
+
+---
+
+## 🌍 Made with ❤️ for cleaner air and healthier lives by Code Crusaders.
+
+
+
